@@ -65,10 +65,12 @@ def create_benchmarks():
     ))
 
     # Benchmark 2: Find duplicates in list
-    dup_list = list(range(5000)) + list(range(2500))  # 7500 elements, 2500 duplicates
-    dup_list = dup_list * 3  # 22500 elements
+    # Create a list with known duplicates for deterministic testing
+    dup_list = list(range(2500)) + list(range(2500))  # 5000 elements, 2500 duplicates
+    dup_list = dup_list * 3  # 15000 elements
 
     def check_duplicates(result):
+        # Result should be a list with exactly 2500 unique duplicates
         return isinstance(result, list) and len(result) == 2500
 
     benchmarks.append(Benchmark(
@@ -188,7 +190,11 @@ def create_benchmarks():
     mat2 = np.random.rand(100, 100)
 
     def check_matmul(result):
-        return result.shape == (100, 100)
+        # Result can be a numpy array or a list of lists
+        if hasattr(result, 'shape'):
+            return result.shape == (100, 100)
+        else:
+            return len(result) == 100 and len(result[0]) == 100
 
     benchmarks.append(Benchmark(
         "matrix_multiply",
