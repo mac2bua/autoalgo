@@ -1,0 +1,9 @@
+[project]
+name = "autoalgo"
+version = "0.1.0"
+description = "Autonomous algorithm optimization"
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "numpy>=2.2.6",
+]
