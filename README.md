@@ -78,12 +78,12 @@ LOOP FOREVER:
 
 1. Look at the git state: the current branch/commit we're on
 2. Tune `algorithms.py` with an experimental idea
-3. `git add autoalgo/algorithms.py && git commit -m "experiment: <description>"`
+3. `git add algorithms.py && git commit -m "experiment: <description>"`
 4. Run the experiment: `uv run evaluate.py > run.log 2>&1`
 5. Read out the results: `grep "^total_time_ms:\|^memory_mb:" run.log`
 6. If the grep output is empty, the run crashed. Run `tail -n 50 run.log` to read the stack trace.
 7. Record the results in the TSV
-8. If total_time_ms improved (lower), `git add autoalgo/results.tsv && git commit --amend --no-edit`
+8. If total_time_ms improved (lower), `git add results.tsv && git commit --amend --no-edit`
 9. If total_time_ms is equal or worse, record the discard commit, then `git reset --hard <previous kept commit>`
 
 **Timeout**: Each experiment should take ~5 minutes. If a run exceeds 15 minutes, kill it and treat it as a failure.
