@@ -20,6 +20,11 @@ with open(results_path, 'r') as f:
             'description': row['description']
         })
 
+# Project directory path
+project_dir = Path(__file__).parent
+chart_path = project_dir / 'optimization_chart.png'
+md_path = project_dir / 'optimization_chart.md'
+
 # Create figure with subplots
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10))
 
@@ -82,24 +87,15 @@ ax2.set_xticks(range(len(commits)))
 ax2.set_xticklabels(short_commits, fontsize=8, rotation=45, ha='right')
 
 plt.tight_layout()
-plt.savefig('/Users/cristian/Repositories/karpathy-autoresearch-demo/optimization_chart.png', dpi=150, bbox_inches='tight')
-print("Chart saved to optimization_chart.png")
+plt.savefig(chart_path, dpi=150, bbox_inches='tight')
+print(f"Chart saved to {chart_path}")
 
-# Also save as Markdown with embedded base64
-import base64
-import io
-
-buf = io.BytesIO()
-plt.savefig(buf, format='png', dpi=150, bbox_inches='tight')
-buf.seek(0)
-img_base64 = base64.b64encode(buf.read()).decode()
-
-# Create markdown report
+# Create markdown report with relative image link
 markdown = f"""# Algorithm Optimization Results
 
 ## Optimization Timeline
 
-![Optimization Chart](data:image/png;base64,{img_base64})
+![Optimization Chart](optimization_chart.png)
 
 ## Results Summary
 
@@ -137,6 +133,6 @@ uv run plot_optimization.py
 ```
 """
 
-with open('/Users/cristian/Repositories/karpathy-autoresearch-demo/optimization_chart.md', 'w') as f:
+with open(md_path, 'w') as f:
     f.write(markdown)
-print("Markdown report saved to optimization_chart.md")
+print(f"Markdown report saved to {md_path}")
