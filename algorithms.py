@@ -118,7 +118,7 @@ class LRUCache:
 def count_inversions(arr: List[int]) -> int:
     """
     Count inversions in an array (pairs where i < j but arr[i] > arr[j]).
-    Optimized: Modified merge sort with cached lengths.
+    Optimized: Merge sort with local variable caching.
     """
     def merge_sort_count(arr: List[int]) -> Tuple[List[int], int]:
         n = len(arr)
@@ -144,10 +144,14 @@ def count_inversions(arr: List[int]) -> int:
                 inversions += left_len - i
                 j += 1
 
-        if i < left_len:
-            merged.extend(left[i:])
-        if j < right_len:
-            merged.extend(right[j:])
+        # Append remaining elements
+        while i < left_len:
+            merged.append(left[i])
+            i += 1
+        while j < right_len:
+            merged.append(right[j])
+            j += 1
+
         return merged, inversions
 
     _, count = merge_sort_count(arr[:])
