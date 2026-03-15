@@ -1,17 +1,17 @@
 Starting autoalgo evaluation...
 ----------------------------------------
-  max_subarray: 9.71 ms
-  find_duplicates: 0.49 ms
-  merge_sorted: 16.93 ms
-  binary_search: 15.75 ms
-  quick_select: 152.65 ms
-  two_sum: 0.04 ms
-  lru_cache: 2.75 ms
-  count_inversions: 183.12 ms
-  lcs: 335.07 ms
-  matrix_multiply: 3.41 ms
+  max_subarray: 9.50 ms
+  find_duplicates: 0.47 ms
+  merge_sorted: 2.25 ms
+  binary_search: 13.64 ms
+  quick_select: 149.59 ms
+  two_sum: 0.03 ms
+  lru_cache: 2.84 ms
+  count_inversions: 183.31 ms
+  lcs: 334.97 ms
+  matrix_multiply: 3.28 ms
 ----------------------------------------
 Benchmarks successful: 10/10
-total_time_ms:      719.920001
+total_time_ms:      699.854960
 memory_mb:          15.4
 benchmarks_run:     10
