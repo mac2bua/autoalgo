@@ -2,43 +2,100 @@
 
 Autonomous algorithm optimization — an experiment to have the LLM do its own research on algorithm performance.
 
-## Overview
+## Acknowledgements
 
-This system autonomously optimizes algorithm implementations for runtime performance. Each experiment runs for a **fixed time budget of 5 minutes**. The goal is to achieve the lowest total execution time across a fixed benchmark suite.
+This project is inspired by [Andrej Karpathy's autoresearch](https://github.com/karpathy/autoresearch), which pioneered the concept of using LLMs to autonomously optimize machine learning models. This project adapts the same approach to algorithm performance optimization.
 
-## Setup
+## What is this?
 
-To set up a new experiment:
+This is a weekend project that demonstrates how to use an LLM (via GitHub Actions) to autonomously optimize algorithm implementations for runtime performance. The system:
 
-1. **Agree on a run tag**: propose a tag based on today's date (e.g., `mar5`). The branch `autoalgo/<tag>` must not already exist — this is a fresh run.
-2. **Create the branch**: `git checkout -b autoalgo/<tag>` from current master.
-3. **Read the in-scope files**:
-   - `README.md` — this file.
-   - `evaluate.py` — fixed evaluation harness, benchmark suite, timing code. Do not modify.
-   - `algorithms.py` — the file you modify. Implement algorithm optimizations here.
-4. **Verify benchmarks work**: Run `uv run evaluate.py` to ensure the benchmark suite works.
-5. **Initialize results.tsv**: Create `results.tsv` with header row and baseline entry. Run `uv run evaluate.py` once to establish YOUR baseline on this hardware.
-6. **Confirm and go**: Confirm setup looks good.
+1. Runs a fixed set of algorithm benchmarks
+2. Tries out different algorithmic approaches
+3. Keeps improvements, discards regressions
+4. Runs automatically every hour
 
-## Experimentation
+## Who is this for?
 
-Each experiment runs for a **fixed time budget of 5 minutes** (wall clock time for running experiments).
+**This is NOT a user-facing tool.** You should NOT try to use this if you're looking for:
+- A library to install
+- A service to run your own experiments
+- Support for running on your own repository
 
-**What you CAN do:**
-- Modify `algorithms.py` — this is the only file you edit. Everything is fair game: algorithm approach, data structures, caching strategies, loop optimizations, batching, etc.
+**This IS for you if you're:**
+- Curious about autonomous LLM-driven development
+- Interested in algorithm optimization techniques
+- Want to understand how to set up autonomous experimentation loops
 
-**What you CANNOT do:**
-- Modify `evaluate.py`. It is read-only. It contains the fixed benchmark suite and timing harness.
-- Install new packages or add dependencies. You can only use what's already in `pyproject.toml`.
-- Modify the benchmark inputs or expected outputs.
+The original autoresearch repo was designed to run while the human sleeps — you could leave it running for 8 hours and wake up to ~70 experimental results. This project aims to do the same for algorithm performance.
 
-**The goal is simple: get the lowest total_time_ms.** Since the time budget is fixed, you don't need to worry about experiment time — it's always 5 minutes. Everything is fair game: change the algorithm, data structures, caching, precomputation, etc.
+## How does it work?
 
-**Memory** is a soft constraint. Some increase is acceptable for meaningful time gains, but it should not blow up dramatically.
+### The Git Branch Pattern
 
-**Simplicity criterion**: All else being equal, simpler is better. A small improvement that adds ugly complexity is not worth it. Conversely, removing something and getting equal or better results is a great outcome — that's a simplification win.
+This project uses a dedicated branch (`autoalgo/mar14`) for autonomous experimentation. This is key to how it works:
 
-**The first run**: Your very first run should always be to establish the baseline, so you will run the evaluation script as is.
+- **Main branch (`main`)**: Stable, production code
+- **Experiment branch (`autoalgo/<tag>`)**: Where autonomous experiments run
+
+The GitHub Actions workflow:
+1. Checks out the experiment branch
+2. Runs experiments by modifying `algorithms.py`
+3. Commits improvements back to the branch (using `git commit --amend`)
+4. Never touches the `main` branch
+
+**Why branches?** This ensures:
+- Every experiment is tracked in git history
+- You can see exactly what changed between runs
+- Failed experiments are cleanly discarded
+- The autonomous loop can run indefinitely without human intervention
+
+### What changes between experiments?
+
+- **Algorithms in `algorithms.py`**: Anything fair game
+  - Different algorithm approaches (e.g., Kadane's vs brute force)
+  - Data structures (hash maps, heaps, trees)
+  - Caching/memoization strategies
+  - Loop optimizations, batching, precomputation
+
+### What stays fixed?
+
+- **`evaluate.py`**: The benchmark suite and timing harness
+- **Time budget**: ~5 minutes per experiment
+- **Benchmark inputs**: Fixed seeds ensure reproducibility
+
+## Setup (for the repo owner only)
+
+If you want to set up your own version:
+
+1. **Create an experiment branch**:
+   ```bash
+   git checkout -b autoalgo/mar15
+   ```
+
+2. **Establish your baseline**:
+   ```bash
+   uv sync
+   uv run evaluate.py > run.log 2>&1
+   ```
+
+3. **Record the baseline** in `results.tsv`:
+   ```
+   commit	total_time_ms	memory_mb	status	description
+   <commit_hash>	<time_from_log>	<memory_from_log>	keep	baseline
+   ```
+
+4. **Configure GitHub Secrets**:
+   - Add `AUTOALGO_PAT` with a Personal Access Token (repo scope)
+
+5. **Enable GitHub Actions** on your repository
+
+6. **Push the branch**:
+   ```bash
+   git push -u origin autoalgo/mar15
+   ```
+
+That's it. The workflow will now run automatically every hour.
 
 ## Output format
 
@@ -47,47 +104,40 @@ Once the script finishes it prints a summary like this:
 ```
 ---
 total_time_ms:    1234.5
-best_time_ms:     45.2
-worst_time_ms:    89.1
-avg_time_ms:      61.7
-memory_mb:        128.4
-benchmarks_run:   20
+memory_mb:        17.0
+benchmarks_run:   10
 ```
 
 ## Logging results
 
-When an experiment is done, log it to `results.tsv` (tab-separated).
-
-The TSV has a header row and 5 columns:
+Results are logged to `results.tsv` (tab-separated):
 
 ```
 commit	total_time_ms	memory_mb	status	description
+abc1234	1234.5	17.0	keep	Optimized quickselect with median-of-medians
+def5678	1245.2	17.0	discard	Simplified LRU cache - slower
 ```
 
-1. git commit hash (short, 7 chars)
-2. total_time_ms achieved (e.g., 1234.567) — use 0.0 for crashes
-3. peak memory in MB (e.g., 128.4) — use 0.0 for crashes
-4. status: `keep`, `discard`, or `crash`
-5. short text description of what this experiment tried
+- `keep`: Improvement over previous best
+- `discard`: No improvement or regression
+- `crash`: Experiment failed
 
-## The experiment loop
+## Files
 
-The experiment runs on a dedicated branch (e.g., `autoalgo/mar5`).
+| File | Purpose |
+|------|---------|
+| `algorithms.py` | Algorithm implementations (MODIFY THIS for optimization) |
+| `evaluate.py` | Fixed evaluation harness (DO NOT MODIFY) |
+| `results.tsv` | Results tracking |
+| `.env.example` | Template for credentials (not used by GitHub Actions) |
 
-LOOP FOREVER:
+## Running locally
 
-1. Look at the git state: the current branch/commit we're on
-2. Tune `algorithms.py` with an experimental idea
-3. `git add algorithms.py && git commit -m "experiment: <description>"`
-4. Run the experiment: `uv run evaluate.py > run.log 2>&1`
-5. Read out the results: `grep "^total_time_ms:\|^memory_mb:" run.log`
-6. If the grep output is empty, the run crashed. Run `tail -n 50 run.log` to read the stack trace.
-7. Record the results in the TSV
-8. If total_time_ms improved (lower), `git add results.tsv && git commit --amend --no-edit`
-9. If total_time_ms is equal or worse, record the discard commit, then `git reset --hard <previous kept commit>`
+```bash
+uv sync
+uv run evaluate.py
+```
 
-**Timeout**: Each experiment should take ~5 minutes. If a run exceeds 15 minutes, kill it and treat it as a failure.
+## License
 
-**Crashes**: If a run crashes, use your judgment. If it's something easy to fix, fix it. If the idea is fundamentally broken, skip it and move on.
-
-**NEVER STOP**: Once the experiment loop has begun, do NOT pause to ask the human if you should continue. You are autonomous.
+MIT License - see LICENSE file for details.
