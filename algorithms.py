@@ -78,37 +78,11 @@ def binary_search(arr: List[int], target: int) -> int:
 def quick_select(nums: List[int], k: int) -> int:
     """
     Find the kth smallest element (0-indexed).
-    Baseline: Lomuto partition scheme with median-of-three pivot.
+    Optimized: Use numpy's partition for O(n) average time.
     """
-    if not nums:
-        raise ValueError("Empty array")
-
-    def partition(left: int, right: int) -> int:
-        # Median-of-three pivot selection
-        mid = (left + right) // 2
-        pivot_idx = mid
-
-        pivot = nums[pivot_idx]
-        nums[pivot_idx], nums[right] = nums[right], nums[pivot_idx]
-
-        store_idx = left
-        for i in range(left, right):
-            if nums[i] < pivot:
-                nums[store_idx], nums[i] = nums[i], nums[store_idx]
-                store_idx += 1
-
-        nums[store_idx], nums[right] = nums[right], nums[store_idx]
-        return store_idx
-
-    left, right = 0, len(nums) - 1
-    while True:
-        pivot_idx = partition(left, right)
-        if pivot_idx == k:
-            return nums[pivot_idx]
-        elif pivot_idx < k:
-            left = pivot_idx + 1
-        else:
-            right = pivot_idx - 1
+    import numpy as np
+    arr = np.array(nums)
+    return np.partition(arr, k)[k]
 
 
 def two_sum(nums: List[int], target: int) -> Optional[Tuple[int, int]]:
