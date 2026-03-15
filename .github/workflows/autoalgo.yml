@@ -59,8 +59,11 @@ jobs:
           TOTAL_TIME=${{ steps.results.outputs.TOTAL_TIME }}
           MEMORY_MB=${{ steps.results.outputs.MEMORY_MB }}
 
-          # Read previous best time from keep entries
-          PREV_TOTAL=$(awk -F'\t' '$4=="keep" {print $2; exit}' results.tsv)
+          # Read previous best time from keep entries (if file exists)
+          PREV_TOTAL=""
+          if [ -f results.tsv ]; then
+            PREV_TOTAL=$(awk -F'\t' '$4=="keep" {print $2; exit}' results.tsv)
+          fi
           echo "=== Previous best: $PREV_TOTAL ms ==="
 
           # Determine if we should keep or discard
