@@ -6,6 +6,9 @@ DO NOT import new packages - only use what's in pyproject.toml.
 """
 
 import random
+import bisect
+import heapq
+import numpy as np
 from typing import List, Tuple, Optional
 
 
@@ -44,7 +47,6 @@ def merge_sorted_arrays(arr1: List[int], arr2: List[int]) -> List[int]:
     Merge two sorted arrays into one sorted array.
     Optimized: Use heapq.merge for efficient merging.
     """
-    import heapq
     return list(heapq.merge(arr1, arr2))
 
 
@@ -53,7 +55,6 @@ def binary_search(arr: List[int], target: int) -> int:
     Binary search returning index of target or -1 if not found.
     Optimized: Use bisect module for faster binary search.
     """
-    import bisect
     idx = bisect.bisect_left(arr, target)
     if idx < len(arr) and arr[idx] == target:
         return idx
@@ -65,7 +66,6 @@ def quick_select(nums: List[int], k: int) -> int:
     Find the kth smallest element (0-indexed).
     Optimized: Use numpy's partition for O(n) average time.
     """
-    import numpy as np
     arr = np.array(nums)
     return np.partition(arr, k)[k]
 
