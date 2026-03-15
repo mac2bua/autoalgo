@@ -37,27 +37,12 @@ def find_duplicates(nums: List[int]) -> List[int]:
 def merge_sorted_arrays(arr1: List[int], arr2: List[int]) -> List[int]:
     """
     Merge two sorted arrays into one sorted array.
-    Optimized: Pre-allocate result list with exact size.
+    Optimized: Use NumPy's concatenate and sort for large arrays.
     """
-    result = [0] * (len(arr1) + len(arr2))
-    i, j, k = 0, 0, 0
-    while i < len(arr1) and j < len(arr2):
-        if arr1[i] <= arr2[j]:
-            result[k] = arr1[i]
-            i += 1
-        else:
-            result[k] = arr2[j]
-            j += 1
-        k += 1
-    while i < len(arr1):
-        result[k] = arr1[i]
-        i += 1
-        k += 1
-    while j < len(arr2):
-        result[k] = arr2[j]
-        j += 1
-        k += 1
-    return result
+    import numpy as np
+    # For large arrays, NumPy concatenate + sort is faster than manual merge
+    combined = np.concatenate([arr1, arr2])
+    return np.sort(combined).tolist()
 
 
 def binary_search(arr: List[int], target: int) -> int:
