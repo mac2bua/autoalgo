@@ -161,24 +161,22 @@ def count_inversions(arr: List[int]) -> int:
 def longest_common_subsequence_length(s1: str, s2: str) -> int:
     """
     Find the length of the longest common subsequence.
-    Optimized: Cache s2 as list for faster character access.
+    Optimized: Using zip for s2 character comparison.
     """
     m, n = len(s1), len(s2)
 
     prev = [0] * (n + 1)
     curr = [0] * (n + 1)
-    s2_list = list(s2)
 
     for i, c1 in enumerate(s1, 1):
         prev_j = prev[0]
         curr[0] = 0
-        for j in range(1, n + 1):
+        for j, c2 in zip(range(1, n + 1), s2):
             temp = prev[j]
-            if c1 == s2_list[j - 1]:
+            if c1 == c2:
                 curr[j] = prev_j + 1
             else:
-                prev_val, curr_j_1 = prev[j], curr[j - 1]
-                curr[j] = prev_val if prev_val > curr_j_1 else curr_j_1
+                curr[j] = curr[j - 1] if curr[j - 1] > prev[j] else prev[j]
             prev_j = temp
         prev, curr = curr, prev
 
