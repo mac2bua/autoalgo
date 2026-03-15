@@ -1,2 +1,2 @@
 commit	total_time_ms	memory_mb	status	description
-ee6e675	0.0	0.0	crash	baseline - 2/10 benchmarks crashed (find_duplicates and matrix_multiply)
+8fb5284	4296.8	17.0	keep	baseline
