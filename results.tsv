@@ -1,2 +1,3 @@
 commit	total_time_ms	memory_mb	status	description
 a1877f5	4186.96	17.0	keep	baseline
+6c1c05d	784.89	16.8	keep	use numpy dot for matrix_multiply
