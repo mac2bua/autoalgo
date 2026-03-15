@@ -193,19 +193,24 @@ def count_inversions(arr: List[int]) -> int:
 def longest_common_subsequence_length(s1: str, s2: str) -> int:
     """
     Find the length of the longest common subsequence.
-    Baseline: Dynamic programming with 2D table.
+    Optimized: Space-efficient DP using two rows.
     """
     m, n = len(s1), len(s2)
-    dp = [[0] * (n + 1) for _ in range(m + 1)]
+
+    # Use two rows instead of full 2D table
+    prev = list(range(n + 1))
+    curr = [0] * (n + 1)
 
     for i in range(1, m + 1):
+        curr[0] = 0
         for j in range(1, n + 1):
             if s1[i-1] == s2[j-1]:
-                dp[i][j] = dp[i-1][j-1] + 1
+                curr[j] = prev[j-1] + 1
             else:
-                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+                curr[j] = max(prev[j], curr[j-1])
+        prev, curr = curr, prev
 
-    return dp[m][n]
+    return prev[n]
 
 
 def matrix_multiply(a, b):
