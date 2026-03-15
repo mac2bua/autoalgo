@@ -5,3 +5,4 @@ a1877f5	4186.96	17.0	keep	baseline
 6d84952	576.18	15.9	keep	use numpy partition for quick_select
 3b72f79	573.97	15.9	keep	use heapq.merge for merge_sorted_arrays
 21328f7	312.32	16.1	keep	bisect for binary_search, cached lengths for count_inversions, cached prev_j for lcs
+6821dd1	258.67	9.5	keep	while loops for merge extension
