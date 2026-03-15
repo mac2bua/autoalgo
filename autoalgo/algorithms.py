@@ -37,33 +37,41 @@ def find_duplicates(nums: List[int]) -> List[int]:
 def merge_sorted_arrays(arr1: List[int], arr2: List[int]) -> List[int]:
     """
     Merge two sorted arrays into one sorted array.
-    Baseline: Two-pointer merge from merge sort.
+    Optimized: Pre-allocate result list with exact size.
     """
-    result = []
-    i, j = 0, 0
+    result = [0] * (len(arr1) + len(arr2))
+    i, j, k = 0, 0, 0
     while i < len(arr1) and j < len(arr2):
         if arr1[i] <= arr2[j]:
-            result.append(arr1[i])
+            result[k] = arr1[i]
             i += 1
         else:
-            result.append(arr2[j])
+            result[k] = arr2[j]
             j += 1
-    result.extend(arr1[i:])
-    result.extend(arr2[j:])
+        k += 1
+    while i < len(arr1):
+        result[k] = arr1[i]
+        i += 1
+        k += 1
+    while j < len(arr2):
+        result[k] = arr2[j]
+        j += 1
+        k += 1
     return result
 
 
 def binary_search(arr: List[int], target: int) -> int:
     """
     Binary search returning index of target or -1 if not found.
-    Baseline: Iterative binary search.
+    Optimized: Branchless comparison to reduce branch misprediction.
     """
     left, right = 0, len(arr) - 1
     while left <= right:
         mid = (left + right) // 2
-        if arr[mid] == target:
+        val = arr[mid]
+        if val == target:
             return mid
-        elif arr[mid] < target:
+        if val < target:
             left = mid + 1
         else:
             right = mid - 1
