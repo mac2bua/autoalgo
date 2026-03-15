@@ -211,22 +211,16 @@ def longest_common_subsequence_length(s1: str, s2: str) -> int:
 def matrix_multiply(a, b):
     """
     Multiply two matrices.
-    Baseline: Standard triple-loop matrix multiplication.
+    Optimized: Use NumPy's highly optimized matrix multiplication.
     """
     import numpy as np
-    rows_a = len(a)
-    cols_a = len(a[0])
-    rows_b = len(b)
-    cols_b = len(b[0])
 
-    if cols_a != rows_b:
-        raise ValueError(f"Cannot multiply: {rows_a}x{cols_a} * {rows_b}x{cols_b}")
+    # Convert to numpy arrays if not already
+    arr_a = a if isinstance(a, np.ndarray) else np.array(a)
+    arr_b = b if isinstance(b, np.ndarray) else np.array(b)
 
-    result = [[0] * cols_b for _ in range(rows_a)]
+    # Use NumPy's optimized matrix multiplication
+    result = np.dot(arr_a, arr_b)
 
-    for i in range(rows_a):
-        for j in range(cols_b):
-            for k in range(cols_a):
-                result[i][j] += a[i][k] * b[k][j]
-
-    return result
+    # Return as list of lists for compatibility
+    return result.tolist()
