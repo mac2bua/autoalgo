@@ -186,9 +186,6 @@ def longest_common_subsequence_length(s1: str, s2: str) -> int:
 def matrix_multiply(a, b):
     """
     Multiply two matrices.
-    Optimized: Use numpy's optimized matrix multiplication.
+    Optimized: Use numpy's optimized matrix multiplication, return numpy array.
     """
-    import numpy as np
-    # Convert to numpy array, multiply, convert back to list
-    result = np.dot(np.array(a), np.array(b))
-    return result.tolist()
+    return np.dot(a, b)
