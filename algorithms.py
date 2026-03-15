@@ -51,17 +51,12 @@ def merge_sorted_arrays(arr1: List[int], arr2: List[int]) -> List[int]:
 def binary_search(arr: List[int], target: int) -> int:
     """
     Binary search returning index of target or -1 if not found.
-    Baseline: Iterative binary search.
+    Optimized: Use bisect module for faster binary search.
     """
-    left, right = 0, len(arr) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if arr[mid] == target:
-            return mid
-        elif arr[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
+    import bisect
+    idx = bisect.bisect_left(arr, target)
+    if idx < len(arr) and arr[idx] == target:
+        return idx
     return -1
 
 
@@ -123,31 +118,36 @@ class LRUCache:
 def count_inversions(arr: List[int]) -> int:
     """
     Count inversions in an array (pairs where i < j but arr[i] > arr[j]).
-    Baseline: Modified merge sort.
+    Optimized: Modified merge sort with cached lengths.
     """
     def merge_sort_count(arr: List[int]) -> Tuple[List[int], int]:
-        if len(arr) <= 1:
+        n = len(arr)
+        if n <= 1:
             return arr, 0
 
-        mid = len(arr) // 2
+        mid = n // 2
         left, left_count = merge_sort_count(arr[:mid])
         right, right_count = merge_sort_count(arr[mid:])
 
         merged = []
         i = j = 0
         inversions = left_count + right_count
+        left_len = len(left)
+        right_len = len(right)
 
-        while i < len(left) and j < len(right):
+        while i < left_len and j < right_len:
             if left[i] <= right[j]:
                 merged.append(left[i])
                 i += 1
             else:
                 merged.append(right[j])
-                inversions += len(left) - i
+                inversions += left_len - i
                 j += 1
 
-        merged.extend(left[i:])
-        merged.extend(right[j:])
+        if i < left_len:
+            merged.extend(left[i:])
+        if j < right_len:
+            merged.extend(right[j:])
         return merged, inversions
 
     _, count = merge_sort_count(arr[:])
@@ -157,21 +157,25 @@ def count_inversions(arr: List[int]) -> int:
 def longest_common_subsequence_length(s1: str, s2: str) -> int:
     """
     Find the length of the longest common subsequence.
-    Optimized: Space-efficient DP using two rows.
+    Optimized: Space-efficient DP with cached character access.
     """
     m, n = len(s1), len(s2)
 
     # Use two rows instead of full 2D table
-    prev = list(range(n + 1))
+    prev = [0] * (n + 1)
     curr = [0] * (n + 1)
 
     for i in range(1, m + 1):
+        c1 = s1[i - 1]
+        prev_j = prev[0]
         curr[0] = 0
         for j in range(1, n + 1):
-            if s1[i-1] == s2[j-1]:
-                curr[j] = prev[j-1] + 1
+            temp = prev[j]
+            if c1 == s2[j - 1]:
+                curr[j] = prev_j + 1
             else:
-                curr[j] = max(prev[j], curr[j-1])
+                curr[j] = prev[j] if prev[j] > curr[j - 1] else curr[j - 1]
+            prev_j = temp
         prev, curr = curr, prev
 
     return prev[n]
