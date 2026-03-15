@@ -27,16 +27,11 @@ def find_max_subarray_sum(nums: List[int]) -> int:
 def find_duplicates(nums: List[int]) -> List[int]:
     """
     Find all duplicate numbers in the list.
-    Baseline: Using a set to track seen numbers.
+    Optimized: Using collections.Counter for C-level performance.
     """
-    seen = set()
-    duplicates = set()
-    for num in nums:
-        if num in seen:
-            duplicates.add(num)
-        else:
-            seen.add(num)
-    return list(duplicates)
+    from collections import Counter
+    counts = Counter(nums)
+    return [num for num, count in counts.items() if count > 1]
 
 
 def merge_sorted_arrays(arr1: List[int], arr2: List[int]) -> List[int]:
