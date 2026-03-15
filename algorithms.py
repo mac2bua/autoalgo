@@ -174,7 +174,8 @@ def longest_common_subsequence_length(s1: str, s2: str) -> int:
             if c1 == s2[j - 1]:
                 curr[j] = prev_j + 1
             else:
-                curr[j] = prev[j] if prev[j] > curr[j - 1] else curr[j - 1]
+                prev_val, curr_j_1 = prev[j], curr[j - 1]
+                curr[j] = prev_val if prev_val > curr_j_1 else curr_j_1
             prev_j = temp
         prev, curr = curr, prev
 
