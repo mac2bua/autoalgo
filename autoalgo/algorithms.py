@@ -78,7 +78,7 @@ def binary_search(arr: List[int], target: int) -> int:
 def quick_select(nums: List[int], k: int) -> int:
     """
     Find the kth smallest element (0-indexed).
-    Baseline: Lomuto partition scheme with median-of-three pivot.
+    Optimized: Lomuto partition with median-of-three pivot.
     """
     if not nums:
         raise ValueError("Empty array")
@@ -159,53 +159,75 @@ class LRUCache:
 def count_inversions(arr: List[int]) -> int:
     """
     Count inversions in an array (pairs where i < j but arr[i] > arr[j]).
-    Baseline: Modified merge sort.
+    Optimized: Merge sort with index bounds instead of slicing.
     """
-    def merge_sort_count(arr: List[int]) -> Tuple[List[int], int]:
-        if len(arr) <= 1:
-            return arr, 0
+    n = len(arr)
+    # Work on a copy to avoid modifying original
+    data = list(arr)
+    temp = [0] * n
 
-        mid = len(arr) // 2
-        left, left_count = merge_sort_count(arr[:mid])
-        right, right_count = merge_sort_count(arr[mid:])
+    def merge_sort_count(left: int, right: int) -> int:
+        if right - left <= 1:
+            return 0
 
-        merged = []
-        i = j = 0
-        inversions = left_count + right_count
+        mid = (left + right) // 2
+        inversions = merge_sort_count(left, mid) + merge_sort_count(mid, right)
 
-        while i < len(left) and j < len(right):
-            if left[i] <= right[j]:
-                merged.append(left[i])
+        # Merge step
+        i, j, k = left, mid, left
+        while i < mid and j < right:
+            if data[i] <= data[j]:
+                temp[k] = data[i]
                 i += 1
             else:
-                merged.append(right[j])
-                inversions += len(left) - i
+                temp[k] = data[j]
+                inversions += mid - i
                 j += 1
+            k += 1
 
-        merged.extend(left[i:])
-        merged.extend(right[j:])
-        return merged, inversions
+        # Copy remaining elements
+        while i < mid:
+            temp[k] = data[i]
+            i += 1
+            k += 1
+        while j < right:
+            temp[k] = data[j]
+            j += 1
+            k += 1
 
-    _, count = merge_sort_count(arr[:])
-    return count
+        # Copy back to data
+        data[left:right] = temp[left:right]
+
+        return inversions
+
+    return merge_sort_count(0, n)
 
 
 def longest_common_subsequence_length(s1: str, s2: str) -> int:
     """
     Find the length of the longest common subsequence.
-    Baseline: Dynamic programming with 2D table.
+    Optimized: Use 1D DP with careful indexing to avoid row swaps.
     """
     m, n = len(s1), len(s2)
-    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    # Ensure s1 is longer to minimize space
+    if m < n:
+        s1, s2 = s2, s1
+        m, n = n, m
+
+    # Use 1D array with a variable to track diagonal value
+    dp = [0] * (n + 1)
 
     for i in range(1, m + 1):
+        prev_diagonal = 0
         for j in range(1, n + 1):
+            temp = dp[j]
             if s1[i-1] == s2[j-1]:
-                dp[i][j] = dp[i-1][j-1] + 1
+                dp[j] = prev_diagonal + 1
             else:
-                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+                dp[j] = max(dp[j], dp[j-1])
+            prev_diagonal = temp
 
-    return dp[m][n]
+    return dp[n]
 
 
 def matrix_multiply(a, b):
