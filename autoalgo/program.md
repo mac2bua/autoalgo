@@ -4,6 +4,15 @@ Autonomous algorithm optimization — an experiment to have the LLM do its own r
 
 **Note:** This project is inspired by [Andrej Karpathy's autoresearch](https://github.com/karpathy/autoresearch).
 
+## ⚠️ Critical: Permission Mode Required
+
+To run this agent autonomously (without manual permission prompts), you MUST configure your LLM client with **dangerous permission mode**:
+
+- **Claude Code CLI**: `claude --dangerously-skip-permissions`
+- **Ollama + Claude**: `ollama launch claude --model ... -- --dangerously-skip-permissions`
+
+**Warning**: This grants the AI agent full permission to execute any command in your project directory without approval. Understand the risks before proceeding.
+
 ## Setup
 
 To set up a new experiment, work with the user to:

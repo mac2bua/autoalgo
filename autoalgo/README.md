@@ -2,6 +2,39 @@
 
 Autonomous algorithm optimization — an experiment to have the LLM do its own research on algorithm performance.
 
+## ⚠️ Security Warning: Dangerous Permission Mode
+
+This project requires running the LLM agent in a **dangerous permission mode** to function autonomously.
+
+### What This Means
+
+When you run Claude Code with `--dangerously-skip-permissions` (or similar settings), you are **granting the AI agent full access to execute any command** in your project directory without any approval prompts. This means the agent can:
+
+- Read, modify, or delete any file in the project
+- Run any shell command
+- Install or remove packages
+- Make git commits and modify history
+
+### Is It Safe?
+
+**For this specific use case, the risk is relatively low because:**
+
+1. The agent is constrained to only modify `algorithms.py` and `results.tsv`
+2. The agent follows a specific loop pattern defined in `program.md`
+3. The agent's actions are limited to the project directory
+4. Git provides a safety net (changes can be reverted with `git reset`)
+
+**However, you should NOT use this setup if:**
+- You're uncomfortable granting full system access to an AI agent
+- Your project contains sensitive data or credentials
+- You're running this on a shared or production system
+
+**Recommendations:**
+- Use a dedicated project directory for autonomous experiments
+- Keep backups of important files
+- Review changes before merging experiment branches
+- Consider running in a container or VM for isolation
+
 ## Acknowledgements
 
 This project is inspired by [Andrej Karpathy's autoresearch](https://github.com/karpathy/autoresearch), which pioneered the concept of using LLMs to autonomously optimize machine learning models. This project adapts the same approach to algorithm performance optimization.
