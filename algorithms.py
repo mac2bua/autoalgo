@@ -42,20 +42,10 @@ def find_duplicates(nums: List[int]) -> List[int]:
 def merge_sorted_arrays(arr1: List[int], arr2: List[int]) -> List[int]:
     """
     Merge two sorted arrays into one sorted array.
-    Baseline: Two-pointer merge from merge sort.
+    Optimized: Use heapq.merge for efficient merging.
     """
-    result = []
-    i, j = 0, 0
-    while i < len(arr1) and j < len(arr2):
-        if arr1[i] <= arr2[j]:
-            result.append(arr1[i])
-            i += 1
-        else:
-            result.append(arr2[j])
-            j += 1
-    result.extend(arr1[i:])
-    result.extend(arr2[j:])
-    return result
+    import heapq
+    return list(heapq.merge(arr1, arr2))
 
 
 def binary_search(arr: List[int], target: int) -> int:
