@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: autoalgo/${{ github.sha }}
+          ref: autoalgo/${{ github.event.after }}
           token: ${{ secrets.AUTOALGO_PAT }}
 
       - name: Set up Python
@@ -27,6 +27,10 @@ jobs:
         run: |
           pip install uv
           uv sync --locked
+
+      - name: Install bc for comparisons
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y bc > /dev/null
 
       - name: Run autoalgo experiment
         id: experiment
@@ -57,16 +61,19 @@ jobs:
           TOTAL_TIME=${{ steps.results.outputs.TOTAL_TIME }}
           MEMORY_MB=${{ steps.results.outputs.MEMORY_MB }}
 
-          # Read previous best time
-          PREV_TOTAL=$(tail -n +2 results.tsv | grep "keep" | head -1 | cut -f2)
+          # Read previous best time from keep entries
+          PREV_TOTAL=$(awk -F'\t' '$4=="keep" {print $2; exit}' results.tsv)
 
-          # Determine if we should keep or discard
-          if [ -z "$PREV_TOTAL" ] || [ "$PREV_TOTAL" = "baseline" ] || [ $(echo "$TOTAL_TIME < $PREV_TOTAL" | bc -l) -eq 1 ]; then
+          # Determine if we should keep or discard using awk for float comparison
+          STATUS="discard"
+          if [ -z "$PREV_TOTAL" ] || [ "$PREV_TOTAL" = "baseline" ]; then
             STATUS="keep"
-            echo " New best time: $TOTAL_TIME ms (previous: $PREV_TOTAL ms)"
           else
-            STATUS="discard"
-            echo " Time not improved: $TOTAL_TIME ms (previous: $PREV_TOTAL ms)"
+            # Compare using awk (returns 1 if TOTAL_TIME < PREV_TOTAL)
+            IS_BETTER=$(awk -v t="$TOTAL_TIME" -v p="$PREV_TOTAL" 'BEGIN { print (t < p) ? 1 : 0 }')
+            if [ "$IS_BETTER" -eq 1 ]; then
+              STATUS="keep"
+            fi
           fi
 
           # Append to results
@@ -83,7 +90,7 @@ jobs:
       - name: Push changes
         if: steps.update_tsv.outcome == 'success'
         run: |
-          git push origin autoalgo/${{ github.sha }} || echo "Push skipped"
+          git push origin autoalgo/${{ github.event.after }} || echo "Push skipped"
 
       - name: Log failure
         if: steps.experiment.outputs.EXIT_CODE != '0'
