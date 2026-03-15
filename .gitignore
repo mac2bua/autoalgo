@@ -37,10 +37,6 @@ env/
 .DS_Store
 Thumbs.db
 
-# Results and logs
-results.tsv
-run.log
-
 # Cache
 .cache/
 *.cache
