@@ -56,6 +56,34 @@ Each experiment takes ~5 minutes. If you leave it running for 8 hours, you can g
 - Interested in algorithm optimization techniques
 - Want to understand how to set up autonomous experimentation loops
 
+## Running Unattended (Autonomous Mode)
+
+To run the agent indefinitely without manual intervention, you must **disable all permission prompts** so the agent can execute commands without waiting for approval.
+
+### For Claude Code
+
+If using **Ollama** (like the author's setup):
+```bash
+ollama launch claude --model qwen3-coder-next:cloud -- --dangerously-skip-permissions
+```
+
+If using the **Claude CLI** directly:
+```bash
+claude --dangerously-skip-permissions
+```
+
+If using **VS Code extension**:
+Add to your settings (e.g., `~/.claude/settings.json`):
+```json
+{
+  "skipDangerousModePermissionPrompt": true
+}
+```
+
+**Why this is needed**: The autonomous loop runs continuously, making many small changes and running commands. Without disabling permission prompts, the agent will pause and wait for you to approve each command, causing it to stall.
+
+**Expected behavior**: Once started, the agent will run experiments for ~5 minutes each, keeping improvements and discarding regressions. On an M-series Mac, you can expect ~12 experiments per hour. Leave it running overnight and check the results in the morning!
+
 ## Setup
 
 To set up a new experiment:
