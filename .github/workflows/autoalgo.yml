@@ -26,7 +26,7 @@ jobs:
       - name: Install uv and dependencies
         run: |
           pip install uv
-          uv sync --locked
+          uv sync
 
       - name: Run autoalgo experiment
         id: experiment
