@@ -6,6 +6,7 @@ DO NOT import new packages - only use what's in pyproject.toml.
 """
 
 import random
+from collections import OrderedDict
 from typing import List, Tuple, Optional
 
 
@@ -117,31 +118,27 @@ def two_sum(nums: List[int], target: int) -> Optional[Tuple[int, int]]:
 class LRUCache:
     """
     LRU Cache implementation.
-    Baseline: Using OrderedDict.
+    Optimized: Using OrderedDict for O(1) operations.
     """
 
     def __init__(self, capacity: int):
         self.capacity = capacity
-        self.cache = {}
-        self.order = []  # Keep track of access order
+        self.cache = OrderedDict()
 
     def get(self, key: int) -> Optional[int]:
         if key not in self.cache:
             return None
         # Move to end (most recently used)
-        self.order.remove(key)
-        self.order.append(key)
+        self.cache.move_to_end(key)
         return self.cache[key]
 
     def put(self, key: int, value: int) -> None:
         if key in self.cache:
-            self.order.remove(key)
+            self.cache.pop(key)
         elif len(self.cache) >= self.capacity:
-            # Remove least recently used
-            lru_key = self.order.pop(0)
-            del self.cache[lru_key]
+            # Remove least recently used (first item)
+            self.cache.popitem(last=False)
         self.cache[key] = value
-        self.order.append(key)
 
 
 def count_inversions(arr: List[int]) -> int:
