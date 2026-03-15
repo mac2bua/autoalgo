@@ -7,4 +7,4 @@ a1877f5	4186.96	17.0	keep	baseline
 21328f7	312.32	16.1	keep	bisect for binary_search, cached lengths for count_inversions, cached prev_j for lcs
 6821dd1	258.67	9.5	keep	while loops for merge extension
 0b6fcd9	250.31	9.5	keep	cache s2 as list for LCS
-7147aed	219.15	9.5	keep	use zip for LCS character comparison
+7147aed	218.75	9.5	keep	use zip for LCS character comparison
